@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 public class WhatsappRepository {
 
     //Assume that each user belongs to at most one group
-    //You can use the below mentioned hashmaps or delete these and create your own.
+    //You can use the below-mentioned hashmaps or delete these and create your own.
     private HashMap<Group, List<User>> groupUserMap;
     private HashMap<Group, List<Message>> groupMessageMap;
     private HashMap<Message, User> senderMap;
@@ -32,17 +32,12 @@ public class WhatsappRepository {
         return true;
     }
 
-    public void createUser(String name, String mobile) {
-        userData.put(mobile, new User(name, mobile));
-    }
-
-    public String changeAdmin(User approver, User user, Group group) throws Exception{
-        if(!groupUserMap.containsKey(group)) throw new Exception("Group does not exist");
-        if(!adminMap.get(group).equals(approver)) throw new Exception("Approver does not have rights");
-        if(!this.userExistsInGroup(group, user)) throw  new Exception("User is not a participant");
-
-        adminMap.put(group, user);
-        return "SUCCESS";
+    public String createUser(String name, String mobile) throws Exception{
+        if (isNewUser(mobile)) {
+            userData.put(mobile, new User(name, mobile));
+            return "Success";
+        }
+        else throw new Exception("Already Exist");
     }
 
     public Group createGroup(List<User> users) {
@@ -59,7 +54,7 @@ public class WhatsappRepository {
     public Group createPersonalChat(List<User> users) {
         String groupName = users.get(1).getName();
         Group personalGroup = new Group(groupName, 2);
-        groupUserMap.put(personalGroup, users);
+        adminMap.put(personalGroup, users.get(0));
         return personalGroup;
     }
 
@@ -81,6 +76,15 @@ public class WhatsappRepository {
         return messages.size();
     }
 
+    public String changeAdmin(User approver, User user, Group group) throws Exception{
+        if(!groupUserMap.containsKey(group)) throw new Exception("Group does not exist");
+        if(!adminMap.get(group).equals(approver)) throw new Exception("Approver does not have rights");
+        if(!this.userExistsInGroup(group, user)) throw  new Exception("User is not a participant");
+
+        adminMap.put(group, user);
+        return "SUCCESS";
+    }
+
     public boolean userExistsInGroup(Group group, User sender) {
         List<User> users = groupUserMap.get(group);
         for(User user: users) {
@@ -89,6 +93,5 @@ public class WhatsappRepository {
 
         return false;
     }
-
 
 }
