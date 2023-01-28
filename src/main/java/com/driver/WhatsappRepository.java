@@ -82,7 +82,7 @@ public class WhatsappRepository {
         if(!this.userExistsInGroup(group, user)) throw  new Exception("User is not a participant");
 
         adminMap.put(group, user);
-        return "SUCCESS";
+        return "Success";
     }
 
     public boolean userExistsInGroup(Group group, User sender) {
